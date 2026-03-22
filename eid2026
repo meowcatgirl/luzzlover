@@ -205,7 +205,7 @@
 
             <div class="letter" id="letter">
                 <div class="letter-content">
-                    <img src="./merged-image-2026-03-22T22-28-01_1_.jpg" alt="Love Letter" class="letter-image">
+                    <img src="merged-image-2026-03-22T22-28-01 (1).jpg" alt="Love Letter" class="letter-image">
                     <button class="btn-close" id="closeBtn">Close Letter</button>
                 </div>
             </div>
