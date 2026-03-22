@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>A Digital Love Letter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital@0;1&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #fce4ec 0%, #ffffff 100%);
+            --env-color: #f8bbd0;
+            --env-inner: #f06292;
+            --letter-bg: #fff9f0;
+            --accent: #d81b60;
+            --wax-color: #f3add1;
+            --heart-color: #ff076a;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: 'Playfair Display', serif;
+            background: var(--bg-gradient);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        #particles-container {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* --- Envelope --- */
+        .scene {
+            position: relative;
+            width: 900px; 
+            max-width: 90vw; 
+            height: 220px;
+            z-index: 20;
+            perspective: 1000px;
+        }
+
+        .envelope {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: var(--env-color);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-radius: 5px;
+        }
+
+        .flap {
+            position: absolute;
+            top: 0; left: 0; width: 0; height: 0;
+            border-left: 450px solid transparent; 
+            border-right: 450px solid transparent;
+            border-top: 110px solid var(--env-inner);
+            transform-origin: top;
+            transition: transform 0.6s ease;
+            z-index: 40; 
+        }
+
+        @media (max-width: 900px) {
+            .scene { height: 180px; }
+            .flap {
+                border-left-width: 45vw; 
+                border-right-width: 45vw;
+                border-top-width: 90px;
+            }
+        }
+
+        .envelope.open .flap { transform: rotateX(180deg); z-index: 10; }
+
+     
+        }
+        .wax-seal::after { content: "❤"; color: var(--heart-color); font-size: 1.5rem; }
+        .envelope.open .wax-seal { opacity: 0; pointer-events: none; }
+
+        .btn-open {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -100%);
+            z-index: 60;
+            padding: 12px 24px;
+            background: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            font-family: inherit; font-weight: bold; color: var(--accent);
+        }
+
+        /* --- THE LETTER --- */
+        .letter {
+            position: absolute;
+            bottom: 0;
+            left: 5%; /* Simple centering for closed state */
+            width: 90%;
+            height: 80%;
+            background: var(--letter-bg);
+            transition: all 0.7s ease-in-out;
+            z-index: 20;
+            overflow: hidden;
+            border-radius: 10px;
+            opacity: 0;
+        }
+
+        .envelope.open .letter { 
+            bottom: 15px; 
+            opacity: 1; 
+        }
+
+        /* Expanded Logic - REBUILT TO FIX SHIFTING */
+        .letter.expanded {
+            position: fixed;
+            top: 0; 
+            left: 0;
+            width: 100%; /* Force full width to prevent right-shift */
+            height: 100%;
+            z-index: 1000;
+            border-radius: 0;
+            background: var(--letter-bg);
+            opacity: 1;
+            overflow-y: scroll; /* Enable Scrolling */
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Visible Scrollbar */
+        .letter.expanded::-webkit-scrollbar {
+            width: 10px;
+            display: block;
+        }
+        .letter.expanded::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .letter.expanded::-webkit-scrollbar-thumb {
+            background: var(--env-inner);
+            border-radius: 10px;
+        }
+
+        .letter-content {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto; /* Pure centering */
+            padding: 40px 15px 100px 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        .letter-image {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        }
+
+        .btn-close {
+            padding: 16px 50px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: inherit;
+            margin-top: 40px;
+            box-shadow: 0 4px 15px rgba(216, 27, 96, 0.3);
+        }
+
+        .petal {
+            position: fixed;
+            background: #ffcdd2;
+            border-radius: 150% 0 150% 0;
+            opacity: 0.8;
+            pointer-events: none;
+            animation: fall linear infinite;
+        }
+        @keyframes fall {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="romanticMusic" loop>
+        <source src="https://cdn.discordapp.com/attachments/1481707613480550515/1481708141916983427/Stan_Getz_-_Misty.mp3?ex=69b44bbd&is=69b2fa3d&hm=c59a2a8923be9d19262da052b391d8a8f38db6e4e086fcaac21109c2c019180c&" type="audio/mpeg">
+    </audio>
+
+    <div id="particles-container"></div>
+
+    <div class="scene">
+        <div class="envelope" id="envelope">
+            <div class="flap"></div>
+            <div class="wax-seal"></div>
+            <button class="btn-open" id="openBtn">Open 💌</button>
+
+            <div class="letter" id="letter">
+                <div class="letter-content">
+                    <img src="./merged-image-2026-03-22T22-28-01_1_.jpg" alt="Love Letter" class="letter-image">
+                    <button class="btn-close" id="closeBtn">Close Letter</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const envelope = document.getElementById('envelope');
+        const letter = document.getElementById('letter');
+        const openBtn = document.getElementById('openBtn');
+        const closeBtn = document.getElementById('closeBtn');
+        const music = document.getElementById('romanticMusic');
+        const particlesContainer = document.getElementById('particles-container');
+
+        let petalInterval;
+
+        function createPetal() {
+            const petal = document.createElement('div');
+            petal.classList.add('petal');
+            petal.style.left = Math.random() * 100 + 'vw';
+            petal.style.width = Math.random() * 12 + 8 + 'px';
+            petal.style.height = petal.style.width;
+            petal.style.animationDuration = Math.random() * 3 + 2 + 's';
+            particlesContainer.appendChild(petal);
+            setTimeout(() => petal.remove(), 5000);
+        }
+
+        openBtn.addEventListener('click', () => {
+            envelope.classList.add('open');
+            openBtn.style.display = 'none';
+            music.play();
+            petalInterval = setInterval(createPetal, 300);
+
+            setTimeout(() => {
+                letter.classList.add('expanded');
+                letter.scrollTop = 0;
+            }, 1000);
+        });
+
+        closeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            letter.classList.remove('expanded');
+            
+            setTimeout(() => {
+                envelope.classList.remove('open');
+                openBtn.style.display = 'block';
+                music.pause();
+                music.currentTime = 0;
+                clearInterval(petalInterval);
+                particlesContainer.innerHTML = ''; 
+            }, 600);
+        });
+    </script>
+</body>
+</html> 
